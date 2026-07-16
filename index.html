@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>跨域就業津貼｜請款期限試算</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF8F3;
+    --paper-dim:#F2EEE4;
+    --ink:#1F2A37;
+    --ink-soft:#5B6472;
+    --ink-faint:#8B92A0;
+    --seal:#AE2B22;
+    --seal-dark:#7E1E17;
+    --brass:#9C7F3C;
+    --line:#DCD5C4;
+    --card:#FFFFFF;
+    --shadow: 0 1px 2px rgba(31,42,55,.04), 0 8px 24px rgba(31,42,55,.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #FFFDF9 0%, var(--paper) 55%),
+      repeating-linear-gradient(180deg, transparent 0 39px, rgba(31,42,55,.025) 39px 40px);
+    color:var(--ink);
+    font-family:'Noto Sans TC', sans-serif;
+    line-height:1.6;
+    padding:0 0 80px;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px;}
+
+  /* Header */
+  header{
+    padding:56px 24px 40px;
+    text-align:center;
+    position:relative;
+  }
+  .eyebrow{
+    font-size:13px;
+    letter-spacing:.32em;
+    color:var(--brass);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  h1{
+    font-family:'Noto Serif TC', serif;
+    font-weight:900;
+    font-size:clamp(28px,5vw,42px);
+    margin:0 0 12px;
+    letter-spacing:.02em;
+  }
+  header p.sub{
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  .rule{
+    width:64px;height:3px;background:var(--brass);
+    margin:22px auto 0;border-radius:2px;
+    opacity:.7;
+  }
+
+  /* Input ledger card */
+  .input-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    padding:32px 32px 28px;
+    margin-bottom:36px;
+    position:relative;
+  }
+  .input-card::before{
+    content:"";
+    position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,var(--seal),var(--brass));
+    border-radius:4px 4px 0 0;
+  }
+  .type-label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+    letter-spacing:.04em;
+  }
+  .type-toggle{
+    display:flex;
+    gap:8px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+  .type-btn{
+    font-family:'Noto Sans TC', sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    padding:9px 16px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:var(--paper-dim);
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:.15s;
+  }
+  .type-btn:hover{border-color:var(--brass);}
+  .type-btn.active{
+    background:var(--ink);
+    color:#fff;
+    border-color:var(--ink);
+  }
+  .type-explain{
+    font-size:12.5px;
+    color:var(--ink-faint);
+    background:var(--paper-dim);
+    border-left:3px solid var(--brass);
+    padding:10px 14px;
+    border-radius:2px;
+    margin:0 0 22px;
+    line-height:1.7;
+  }
+  .field-row.disabled-b .field-b{
+    opacity:.45;
+    pointer-events:none;
+  }
+
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+  @media (max-width:560px){ .field-row{grid-template-columns:1fr;} }
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    letter-spacing:.04em;
+  }
+  input[type=date]{
+    width:100%;
+    padding:12px 14px;
+    font-family:'Noto Sans TC', sans-serif;
+    font-size:16px;
+    color:var(--ink);
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    border-radius:3px;
+    outline:none;
+    transition:border-color .15s, background .15s;
+  }
+  input[type=date]:focus{
+    border-color:var(--brass);
+    background:#fff;
+  }
+  .hint{
+    font-size:12.5px;
+    color:var(--ink-faint);
+    margin-top:16px;
+  }
+
+  .base-result{
+    margin-top:24px;
+    padding:16px 20px;
+    background:var(--paper-dim);
+    border:1px dashed var(--line);
+    border-radius:3px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .base-result .label{
+    font-size:13px;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .base-result .value{
+    font-family:'Noto Serif TC', serif;
+    font-weight:700;
+    font-size:20px;
+    color:var(--seal-dark);
+  }
+  .base-result .value.empty{
+    color:var(--ink-faint);
+    font-family:'Noto Sans TC',sans-serif;
+    font-weight:400;
+    font-size:14px;
+  }
+
+  /* Timeline */
+  .timeline{
+    position:relative;
+    margin-top:8px;
+  }
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left:29px;
+    top:8px;
+    bottom:8px;
+    width:2px;
+    background:linear-gradient(180deg, var(--brass), var(--line) 90%);
+    opacity:.5;
+  }
+  @media (max-width:560px){ .timeline::before{left:21px;} }
+
+  .milestone{
+    position:relative;
+    display:grid;
+    grid-template-columns:60px 1fr;
+    gap:0 20px;
+    margin-bottom:18px;
+  }
+  @media (max-width:560px){ .milestone{grid-template-columns:44px 1fr;} }
+
+  .node{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding-top:22px;
+  }
+  .node .dot{
+    width:14px;height:14px;
+    border-radius:50%;
+    background:var(--card);
+    border:3px solid var(--brass);
+    position:relative;
+    z-index:1;
+  }
+  .milestone.due .node .dot{
+    border-color:var(--seal);
+    background:var(--seal);
+    box-shadow:0 0 0 4px rgba(174,43,34,.12);
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:16px;
+    align-items:center;
+  }
+  @media (max-width:560px){ .card{grid-template-columns:1fr;} }
+
+  .card .left .tag{
+    display:inline-block;
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:.08em;
+    color:var(--brass);
+    background:#FBF4E4;
+    border:1px solid #ECDCAF;
+    padding:2px 8px;
+    border-radius:20px;
+    margin-bottom:8px;
+  }
+  .card .left .day{
+    font-family:'Noto Serif TC', serif;
+    font-weight:700;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .card .left .date{
+    font-size:14.5px;
+    color:var(--ink-soft);
+  }
+  .card .left .date .empty-txt{color:var(--ink-faint);}
+
+  /* Seal / stamp */
+  .seal{
+    justify-self:end;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    transform:rotate(-6deg);
+    opacity:0;
+    transition:opacity .3s;
+  }
+  .seal.show{opacity:1;}
+  .seal .ring{
+    width:74px;height:74px;
+    border:2.5px solid var(--seal);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--seal);
+    position:relative;
+    background:radial-gradient(circle at 50% 50%, rgba(174,43,34,.05), transparent 70%);
+  }
+  .seal .ring::after{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border:1px solid var(--seal);
+    border-radius:50%;
+    opacity:.55;
+  }
+  .seal .ring .txt{
+    font-family:'Noto Serif TC', serif;
+    font-weight:900;
+    font-size:12px;
+    line-height:1.15;
+    text-align:center;
+    letter-spacing:.04em;
+  }
+  .seal .deadline-date{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--seal-dark);
+    transform:rotate(6deg);
+    white-space:nowrap;
+  }
+
+  /* Monthly interval section */
+  .month-section{
+    margin-top:44px;
+    border-top:1px solid var(--line);
+    padding-top:28px;
+  }
+  .month-section h2{
+    font-family:'Noto Serif TC', serif;
+    font-size:20px;
+    font-weight:700;
+    margin:0 0 6px;
+  }
+  .section-hint{
+    font-size:13px;
+    color:var(--ink-faint);
+    margin:0 0 20px;
+  }
+  .month-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  @media (max-width:720px){ .month-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:480px){ .month-grid{grid-template-columns:1fr;} }
+
+  .month-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:14px 16px;
+    position:relative;
+    box-shadow:var(--shadow);
+  }
+  .month-card.claim-month{
+    border-color:var(--seal);
+    background:#FCF6F1;
+  }
+  .month-card .m-label{
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:.06em;
+    color:var(--brass);
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .month-card.claim-month .m-label{color:var(--seal-dark);}
+  .month-card .m-label .badge{
+    font-size:10px;
+    font-weight:700;
+    color:#fff;
+    background:var(--seal);
+    padding:1px 6px;
+    border-radius:20px;
+  }
+  .month-card .m-range{
+    font-size:13.5px;
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .month-card .m-range .empty-txt{color:var(--ink-faint);}
+  .month-card .m-days{
+    margin-top:6px;
+    font-size:11.5px;
+    color:var(--ink-faint);
+  }
+
+  /* Notice panel — always visible, prominent */
+  .notice-panel{
+    margin-top:44px;
+    background:#FCF6F1;
+    border:1px solid #ECD9C8;
+    border-left:5px solid var(--seal);
+    border-radius:4px;
+    padding:24px 26px;
+    box-shadow:var(--shadow);
+  }
+  .notice-item{
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    line-height:1.9;
+    margin:0;
+  }
+  .notice-item + .notice-item{
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px dashed #E3D2BF;
+  }
+  .notice-item .mark{
+    color:var(--seal);
+    font-weight:900;
+    margin-right:4px;
+  }
+
+  footer{
+    text-align:center;
+    margin-top:56px;
+    font-size:12px;
+    color:var(--ink-faint);
+  }
+
+  .actions{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    margin-top:28px;
+  }
+  button.btn{
+    font-family:'Noto Sans TC', sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    padding:10px 20px;
+    border-radius:3px;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:.15s;
+  }
+  button.btn:hover{border-color:var(--brass);color:var(--ink);}
+  button.btn.primary{
+    background:var(--ink);
+    color:#fff;
+    border-color:var(--ink);
+  }
+  button.btn.primary:hover{background:#141c26;}
+
+  @media print{
+    .input-card, .actions{display:none;}
+    body{background:#fff;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">青年跨域就業津貼</div>
+  <h1>請款期限試算</h1>
+  <p class="sub">輸入加保日與租屋日，系統將自動取較晚日期為起算基準，並列出五次請款的到期日。</p>
+  <div class="rule"></div>
+</header>
+
+<div class="wrap">
+
+  <div class="input-card">
+    <label class="type-label">請款類型</label>
+    <div class="type-toggle" id="typeToggle">
+      <button type="button" class="type-btn active" data-type="rent">租屋補助金</button>
+      <button type="button" class="type-btn" data-type="commute">異地就業交通補助金</button>
+    </div>
+    <p class="type-explain" id="typeExplain">
+      租屋補助金須「受僱且租屋」，以加保日與租屋日<strong>兩者中較晚者</strong>起算連續滿 30 日；請同時填寫兩個日期。
+    </p>
+
+    <div class="field-row" id="fieldRow">
+      <div>
+        <label for="dateA">加保日</label>
+        <input type="date" id="dateA">
+      </div>
+      <div class="field-b">
+        <label for="dateB">租屋日</label>
+        <input type="date" id="dateB">
+      </div>
+    </div>
+    <p class="hint">＊申請租屋補助金時，兩者皆可填寫，系統會自動取「較晚」的日期作為起算基準；僅填其中一項亦可。<br>＊日期欄位為西元年份選取（瀏覽器限制），計算結果將自動換算為民國年顯示。</p>
+
+    <div class="base-result">
+      <span class="label">起算基準日</span>
+      <span class="value empty" id="baseDateOut">請輸入日期</span>
+    </div>
+  </div>
+
+  <div class="timeline" id="timeline"></div>
+
+  <div class="month-section">
+    <h2>每月在職區間（核銷用）</h2>
+    <p class="section-hint">依加保或租屋起算日，每滿 30 日為一個月，共 12 個月，每個月列出起訖日期，供請款核銷附件使用。</p>
+    <div class="month-grid" id="monthGrid"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" id="resetBtn">清除重填</button>
+    <button class="btn primary" id="printBtn">列印 / 存成 PDF</button>
+  </div>
+
+  <div class="notice-panel">
+    <p class="notice-item"><span class="mark">●</span> 第1次請款為1個月，第2至4次請款為3個月一次，第5次請款為2個月，計5次請款，請注意請款期限。</p>
+    <p class="notice-item"><span class="mark">●</span> 申請租屋補助金，應於受僱且租屋之日起90日內提出申請，並須連續受僱滿30日；申請異地就業交通補助金者，應於連續受僱滿30日之日起90日內提出申請。申請人應檢附相關證明文件，向就業所在地轄區公立就業服務機構提出申請，得親自、委託他人或以郵寄方式辦理。最長補助12個月，且二項補助僅得擇一申請，申請人須具有實際租屋或交通往返之事實。補助期間以每30日為1個月計算；末月期間逾20日未滿30日者，仍以1個月計算，未滿20日者不予發給補助。</p>
+  </div>
+
+  <footer>此工具僅供試算參考，實際請款期限請以勞動部勞動力發展署公告及承辦單位認定為準。</footer>
+</div>
+
+<script>
+  const MS_PER_DAY = 86400000;
+
+  // 5 claim milestones: [ 第N日, 期限天數(自第N日起算) ]
+  const MILESTONES = [
+    { n: 30,  claimDays: 59, label: '第 1 次請款', tag: '滿 30 日' },
+    { n: 120, claimDays: 89, label: '第 2 次請款', tag: '滿 120 日' },
+    { n: 210, claimDays: 89, label: '第 3 次請款', tag: '滿 210 日' },
+    { n: 300, claimDays: 89, label: '第 4 次請款', tag: '滿 300 日' },
+    { n: 360, claimDays: 89, label: '第 5 次請款', tag: '滿 360 日' },
+  ];
+
+  const dateAInput = document.getElementById('dateA');
+  const dateBInput = document.getElementById('dateB');
+  const baseDateOut = document.getElementById('baseDateOut');
+  const timelineEl = document.getElementById('timeline');
+  const monthGridEl = document.getElementById('monthGrid');
+  const typeToggle = document.getElementById('typeToggle');
+  const typeExplain = document.getElementById('typeExplain');
+  const fieldRow = document.getElementById('fieldRow');
+
+  let subsidyType = 'rent'; // 'commute' = 交通補助金（僅加保日）, 'rent' = 租屋補助金（取較晚者）
+
+  const TYPE_EXPLAIN = {
+    commute: '交通補助金以「加保日」起算連續受僱滿 30 日即可申請，<strong>不涉及租屋日</strong>；租屋日欄位將暫停使用。',
+    rent: '租屋補助金須「受僱且租屋」，以加保日與租屋日<strong>兩者中較晚者</strong>起算連續滿 30 日；請同時填寫兩個日期。'
+  };
+
+  typeToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('.type-btn');
+    if(!btn) return;
+    subsidyType = btn.dataset.type;
+    [...typeToggle.querySelectorAll('.type-btn')].forEach(b => b.classList.toggle('active', b === btn));
+    typeExplain.innerHTML = TYPE_EXPLAIN[subsidyType];
+    fieldRow.classList.toggle('disabled-b', subsidyType === 'commute');
+    if(subsidyType === 'commute') dateBInput.value = '';
+    render();
+  });
+
+  function parseLocalDate(str){
+    if(!str) return null;
+    const [y,m,d] = str.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+
+  function toRocYear(y){
+    return y - 1911;
+  }
+
+  function fmt(date){
+    if(!date) return '';
+    const y = toRocYear(date.getFullYear());
+    const m = String(date.getMonth()+1).padStart(2,'0');
+    const d = String(date.getDate()).padStart(2,'0');
+    return `民國${y}年${m}月${d}日`;
+  }
+
+  function fmtShort(date){
+    if(!date) return '';
+    const y = toRocYear(date.getFullYear());
+    const m = String(date.getMonth()+1).padStart(2,'0');
+    const d = String(date.getDate()).padStart(2,'0');
+    return `${y}/${m}/${d}`;
+  }
+
+  function addDays(date, days){
+    return new Date(date.getTime() + days*MS_PER_DAY);
+  }
+
+  function getBaseDate(){
+    const a = parseLocalDate(dateAInput.value);
+    if(subsidyType === 'commute') return a; // 交通補助金僅以加保日起算
+    const b = parseLocalDate(dateBInput.value);
+    if(a && b) return a > b ? a : b;
+    return a || b || null;
+  }
+
+  function render(){
+    const base = getBaseDate();
+
+    if(base){
+      baseDateOut.textContent = fmt(base);
+      baseDateOut.classList.remove('empty');
+    } else {
+      baseDateOut.textContent = '請輸入日期';
+      baseDateOut.classList.add('empty');
+    }
+
+    // milestone timeline
+    timelineEl.innerHTML = '';
+    MILESTONES.forEach(m => {
+      const milestoneDate = base ? addDays(base, m.n - 1) : null;
+      const deadlineDate = milestoneDate ? addDays(milestoneDate, m.claimDays) : null;
+
+      const row = document.createElement('div');
+      row.className = 'milestone' + (base ? ' due' : '');
+      row.innerHTML = `
+        <div class="node"><div class="dot"></div></div>
+        <div class="card">
+          <div class="left">
+            <span class="tag">${m.tag}</span>
+            <p class="day">${m.label}</p>
+            <p class="date">${milestoneDate
+              ? `滿${m.n}日日期：<strong>${fmt(milestoneDate)}</strong>`
+              : '<span class="empty-txt">輸入日期後將自動計算</span>'}</p>
+          </div>
+          <div class="seal ${deadlineDate ? 'show':''}">
+            <div class="ring">
+              <div class="txt">請款<br>期限</div>
+            </div>
+            <div class="deadline-date">${deadlineDate ? fmt(deadlineDate) : ''}</div>
+          </div>
+        </div>
+      `;
+      timelineEl.appendChild(row);
+    });
+
+    // monthly interval cards (每月在職區間，核銷用)
+    monthGridEl.innerHTML = '';
+    const claimMonthNumbers = [1, 4, 7, 10, 12]; // 對應滿30/120/210/300/360日的月份
+    for(let i = 0; i < 12; i++){
+      const monthNo = i + 1;
+      const start = base ? addDays(base, 30*i) : null;
+      const end = base ? addDays(base, 30*(i+1) - 1) : null;
+      const isClaim = claimMonthNumbers.includes(monthNo);
+
+      const card = document.createElement('div');
+      card.className = 'month-card' + (isClaim ? ' claim-month' : '');
+      card.innerHTML = `
+        <div class="m-label">
+          <span>第 ${monthNo} 個月</span>
+          ${isClaim ? '<span class="badge">請款月</span>' : ''}
+        </div>
+        <div class="m-range">
+          ${start && end
+            ? `${fmtShort(start)} ～ ${fmtShort(end)}`
+            : '<span class="empty-txt">輸入日期後將自動計算</span>'}
+        </div>
+        <div class="m-days">在職滿 ${30*monthNo} 日</div>
+      `;
+      monthGridEl.appendChild(card);
+    }
+  }
+
+  dateAInput.addEventListener('input', render);
+  dateBInput.addEventListener('input', render);
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    dateAInput.value = '';
+    dateBInput.value = '';
+    render();
+  });
+
+  function buildPrintHTML(){
+    const base = getBaseDate();
+    const typeName = subsidyType === 'rent' ? '租屋補助金' : '異地就業交通補助金';
+
+    const milestoneRows = MILESTONES.map(m => {
+      const milestoneDate = base ? addDays(base, m.n - 1) : null;
+      const deadlineDate = milestoneDate ? addDays(milestoneDate, m.claimDays) : null;
+      return `<tr>
+        <td>${m.label}</td>
+        <td>${m.tag}</td>
+        <td>${milestoneDate ? fmt(milestoneDate) : '—'}</td>
+        <td class="dl">${deadlineDate ? fmt(deadlineDate) : '—'}</td>
+      </tr>`;
+    }).join('');
+
+    const claimMonthNumbers = [1, 4, 7, 10, 12];
+    const monthRows = Array.from({length:12}, (_, i) => {
+      const monthNo = i + 1;
+      const start = base ? addDays(base, 30*i) : null;
+      const end = base ? addDays(base, 30*(monthNo) - 1) : null;
+      const isClaim = claimMonthNumbers.includes(monthNo);
+      return `<tr class="${isClaim ? 'claim' : ''}">
+        <td>第 ${monthNo} 個月${isClaim ? '（請款月）' : ''}</td>
+        <td>${start && end ? `${fmtShort(start)} ～ ${fmtShort(end)}` : '—'}</td>
+      </tr>`;
+    }).join('');
+
+    return `<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="UTF-8">
+<title>跨域就業津貼｜請款期限試算</title>
+<style>
+  body{font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;color:#1F2A37;padding:32px;max-width:800px;margin:0 auto;}
+  h1{font-size:22px;border-bottom:3px solid #AE2B22;padding-bottom:10px;}
+  h2{font-size:16px;margin-top:28px;border-left:4px solid #9C7F3C;padding-left:8px;}
+  .meta{font-size:14px;color:#5B6472;margin:6px 0 20px;}
+  .meta b{color:#AE2B22;}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px;}
+  th,td{border:1px solid #DCD5C4;padding:8px 10px;text-align:left;}
+  th{background:#F2EEE4;}
+  td.dl{color:#AE2B22;font-weight:700;}
+  tr.claim{background:#FCF6F1;}
+  .notice{margin-top:26px;font-size:12.5px;line-height:1.8;background:#FCF6F1;border-left:4px solid #AE2B22;padding:14px 16px;}
+  .notice p{margin:0 0 10px;}
+  .notice p:last-child{margin-bottom:0;}
+  footer{margin-top:28px;font-size:11px;color:#8B92A0;}
+  @media print{ body{padding:0;} }
+</style></head>
+<body>
+  <h1>跨域就業津貼｜請款期限試算</h1>
+  <p class="meta">請款類型：<b>${typeName}</b>　｜　起算基準日：<b>${base ? fmt(base) : '未輸入'}</b></p>
+
+  <h2>五次請款節點與期限</h2>
+  <table>
+    <thead><tr><th>次序</th><th>節點</th><th>滿日日期</th><th>請款期限</th></tr></thead>
+    <tbody>${milestoneRows}</tbody>
+  </table>
+
+  <h2>每月在職區間（核銷用）</h2>
+  <table>
+    <thead><tr><th>月份</th><th>區間</th></tr></thead>
+    <tbody>${monthRows}</tbody>
+  </table>
+
+  <div class="notice">
+    <p>● 第1次請款為1個月，第2至4次請款為3個月一次，第5次請款為2個月，計5次請款，請注意請款期限。</p>
+    <p>● 申請租屋補助金，應於受僱且租屋之日起90日內提出申請，並須連續受僱滿30日；申請異地就業交通補助金者，應於連續受僱滿30日之日起90日內提出申請。申請人應檢附相關證明文件，向就業所在地轄區公立就業服務機構提出申請，得親自、委託他人或以郵寄方式辦理。最長補助12個月，且二項補助僅得擇一申請，申請人須具有實際租屋或交通往返之事實。補助期間以每30日為1個月計算；末月期間逾20日未滿30日者，仍以1個月計算，未滿20日者不予發給補助。</p>
+  </div>
+
+  <footer>此工具僅供試算參考，實際請款期限請以勞動部勞動力發展署公告及承辦單位認定為準。</footer>
+</body></html>`;
+  }
+
+  document.getElementById('printBtn').addEventListener('click', () => {
+    const printWin = window.open('', '_blank');
+    if(!printWin){
+      alert('瀏覽器封鎖了新視窗，請允許彈出視窗後再試一次，或使用瀏覽器選單中的「列印」功能。');
+      return;
+    }
+    printWin.document.open();
+    printWin.document.write(buildPrintHTML());
+    printWin.document.close();
+    printWin.onload = () => {
+      printWin.focus();
+      printWin.print();
+    };
+    // Fallback in case onload doesn't fire (already-loaded blank doc)
+    setTimeout(() => {
+      printWin.focus();
+      printWin.print();
+    }, 300);
+  });
+
+  render();
+</script>
+
+</body>
+</html>
