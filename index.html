@@ -675,6 +675,22 @@
   function buildPrintHTML(){
     const base = getBaseDate();
     const typeName = subsidyType === 'rent' ? '租屋補助金' : '異地就業交通補助金';
+    const dateA = parseLocalDate(dateAInput.value);
+    const dateB = subsidyType === 'rent' ? parseLocalDate(dateBInput.value) : null;
+
+    // 起算基準日說明列：租屋補助金顯示兩個來源日期＋較晚者；交通補助金只顯示加保日
+    let metaRowsHTML = '';
+    if(subsidyType === 'rent'){
+      metaRowsHTML = `
+        <div class="meta-row"><span class="meta-label">加保日</span><span class="meta-val">${dateA ? fmt(dateA) : '未輸入'}</span></div>
+        <div class="meta-row"><span class="meta-label">租屋日</span><span class="meta-val">${dateB ? fmt(dateB) : '未輸入'}</span></div>
+        <div class="meta-row highlight"><span class="meta-label">起算基準日（取較晚者）</span><span class="meta-val">${base ? fmt(base) : '未輸入'}</span></div>
+      `;
+    } else {
+      metaRowsHTML = `
+        <div class="meta-row highlight"><span class="meta-label">加保日（起算基準日）</span><span class="meta-val">${base ? fmt(base) : '未輸入'}</span></div>
+      `;
+    }
 
     const milestoneRows = MILESTONES.map(m => {
       const milestoneDate = base ? addDays(base, m.n - 1) : null;
@@ -703,25 +719,32 @@
 <html lang="zh-Hant"><head><meta charset="UTF-8">
 <title>跨域就業津貼｜請款期限試算</title>
 <style>
-  body{font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;color:#1F2A37;padding:32px;max-width:800px;margin:0 auto;}
-  h1{font-size:22px;border-bottom:3px solid #AE2B22;padding-bottom:10px;}
-  h2{font-size:16px;margin-top:28px;border-left:4px solid #9C7F3C;padding-left:8px;}
-  .meta{font-size:14px;color:#5B6472;margin:6px 0 20px;}
-  .meta b{color:#AE2B22;}
-  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px;}
-  th,td{border:1px solid #DCD5C4;padding:8px 10px;text-align:left;}
+  *{box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  body{font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;color:#1F2A37;padding:20px 28px;max-width:800px;margin:0 auto;font-size:12.5px;}
+  h1{font-size:19px;border-bottom:3px solid #AE2B22;padding-bottom:8px;margin:0 0 8px;}
+  .type-line{font-size:12.5px;color:#5B6472;margin:0 0 4px;}
+  .type-line b{color:#AE2B22;}
+  .meta-box{display:flex;flex-wrap:wrap;gap:4px 24px;margin:6px 0 14px;padding:8px 12px;background:#F2EEE4;border:1px solid #DCD5C4;border-radius:3px;}
+  .meta-row{font-size:12px;color:#5B6472;}
+  .meta-row .meta-label{font-weight:600;margin-right:6px;}
+  .meta-row .meta-val{font-weight:700;color:#1F2A37;}
+  .meta-row.highlight .meta-val{color:#AE2B22;}
+  h2{font-size:14px;margin:16px 0 6px;border-left:4px solid #9C7F3C;padding-left:7px;}
+  table{width:100%;border-collapse:collapse;margin-top:4px;font-size:12px;}
+  th,td{border:1px solid #DCD5C4;padding:5px 8px;text-align:left;}
   th{background:#F2EEE4;}
   td.dl{color:#AE2B22;font-weight:700;}
   tr.claim{background:#FCF6F1;}
-  .notice{margin-top:26px;font-size:12.5px;line-height:1.8;background:#FCF6F1;border-left:4px solid #AE2B22;padding:14px 16px;}
-  .notice p{margin:0 0 10px;}
+  .notice{margin-top:14px;font-size:11px;line-height:1.6;background:#FCF6F1;border-left:4px solid #AE2B22;padding:10px 12px;}
+  .notice p{margin:0 0 6px;}
   .notice p:last-child{margin-bottom:0;}
-  footer{margin-top:28px;font-size:11px;color:#8B92A0;}
-  @media print{ body{padding:0;} }
+  footer{margin-top:14px;font-size:10px;color:#8B92A0;}
+  @media print{ body{padding:0;} @page{margin:12mm; size:A4;} }
 </style></head>
 <body>
   <h1>跨域就業津貼｜請款期限試算</h1>
-  <p class="meta">請款類型：<b>${typeName}</b>　｜　起算基準日：<b>${base ? fmt(base) : '未輸入'}</b></p>
+  <p class="type-line">請款類型：<b>${typeName}</b></p>
+  <div class="meta-box">${metaRowsHTML}</div>
 
   <h2>五次請款節點與期限</h2>
   <table>
